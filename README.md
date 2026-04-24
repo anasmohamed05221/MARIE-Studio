@@ -1,5 +1,5 @@
+## 🖥️ MARIE Studio
 <div align="center">
-# 🖥️ MARIE Studio
  
 ### A two-pass assembler for the MARIE architecture
 *Translate MARIE assembly into binary and hexadecimal machine code, instantly.*
@@ -10,15 +10,20 @@
 ![Architecture](https://img.shields.io/badge/Architecture-MARIE-blueviolet?style=flat-square)
  
 </div>
+
 ---
  
 ## 📸 Preview
  
 <div align="center">
-| Empty Editor | After Assembling |
-|:---:|:---:|
-| <img src="preview_empty.png" alt="MARIE Studio - Empty Editor" width="440"/> | <img src="preview_output.png" alt="MARIE Studio - After Assembling" width="440"/> |
+**Empty Editor**
  
+<img src="preview_empty.png" alt="MARIE Studio - Empty Editor" width="800"/>
+<br/><br/>
+ 
+**After Assembling**
+ 
+<img src="preview_output.png" alt="MARIE Studio - After Assembling" width="800"/>
 </div>
  
 ---
