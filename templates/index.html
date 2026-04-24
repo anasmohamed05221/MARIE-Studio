@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MARIE Studio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0e14;
+      --bg2:      #0f1520;
+      --bg3:      #151d2e;
+      --border:   #1e2d45;
+      --accent:   #00d4ff;
+      --accent2:  #00ff88;
+      --amber:    #ffb300;
+      --red:      #ff4d4d;
+      --text:     #c8d8f0;
+      --muted:    #4a6080;
+      --mono:     'Share Tech Mono', monospace;
+      --display:  'Rajdhani', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--mono);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* scanline overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0,0,0,0.03) 2px,
+        rgba(0,0,0,0.03) 4px
+      );
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 0 28px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      border: 1.5px solid var(--accent);
+      border-radius: 6px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+
+    .logo-icon::before {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--accent);
+      border-radius: 2px;
+      box-shadow: 0 0 8px var(--accent);
+    }
+
+    .logo-text {
+      font-family: var(--display);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #fff;
+    }
+
+    .logo-text span { color: var(--accent); }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent2);
+      border-radius: 50%;
+      box-shadow: 0 0 6px var(--accent2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.4; }
+    }
+
+    /* ── Main layout ── */
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      overflow: hidden;
+    }
+
+    /* ── Panels ── */
+    .panel {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+    }
+
+    .panel:last-child { border-right: none; }
+
+    .panel-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .panel-title {
+      font-family: var(--display);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .panel-badge {
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--accent);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    /* ── Editor area ── */
+    .editor-wrap {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .line-numbers {
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 16px 10px 16px 14px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--muted);
+      text-align: right;
+      user-select: none;
+      min-width: 44px;
+      overflow: hidden;
+    }
+
+    #editor {
+      flex: 1;
+      background: var(--bg);
+      border: none;
+      outline: none;
+      resize: none;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      padding: 16px 18px;
+      caret-color: var(--accent);
+      overflow-y: auto;
+    }
+
+    #editor::placeholder { color: var(--muted); }
+
+    #editor:focus { background: #0c1219; }
+
+    /* ── Toolbar ── */
+    .toolbar {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .btn-assemble {
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      font-family: var(--display);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 9px 28px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-assemble:hover {
+      background: #33deff;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+    }
+
+    .btn-assemble:active { transform: scale(0.97); }
+
+    .btn-assemble.loading {
+      background: var(--muted);
+      pointer-events: none;
+    }
+
+    .btn-clear {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 1px;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-clear:hover { border-color: var(--muted); color: var(--text); }
+
+    .toolbar-info {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    /* ── Output panel ── */
+    .output-wrap {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    /* Empty state */
+    .empty-state {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: var(--muted);
+    }
+
+    .empty-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 18px);
+      grid-template-rows: repeat(4, 18px);
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .empty-grid span {
+      width: 18px;
+      height: 18px;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      font-size: 8px;
+      display: grid;
+      place-items: center;
+      opacity: 0.5;
+    }
+
+    .empty-label {
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Symbol table */
+    .symbol-section {
+      margin-bottom: 16px;
+    }
+
+    .section-label {
+      font-size: 10px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .symbol-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .symbol-pill {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .symbol-pill .sym-name { color: var(--amber); }
+    .symbol-pill .sym-addr { color: var(--muted); font-size: 11px; }
+
+    /* Output table */
+    .out-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12.5px;
+    }
+
+    .out-table th {
+      font-family: var(--display);
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      text-align: left;
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 600;
+    }
+
+    .out-table td {
+      padding: 7px 12px;
+      border-bottom: 1px solid rgba(30, 45, 69, 0.5);
+      vertical-align: middle;
+    }
+
+    .out-table tr:hover td { background: var(--bg3); }
+
+    .out-table tr:last-child td { border-bottom: none; }
+
+    .td-addr {
+      color: var(--muted);
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .td-binary { color: var(--accent2); letter-spacing: 1.5px; }
+
+    /* Highlight opcode vs operand */
+    .td-binary .op  { color: var(--accent); }
+    .td-binary .addr-bits { color: var(--accent2); opacity: 0.75; }
+
+    .td-hex {
+      color: var(--amber);
+      font-weight: bold;
+      font-size: 14px;
+      letter-spacing: 2px;
+    }
+
+    /* Error */
+    .error-box {
+      background: rgba(255, 77, 77, 0.08);
+      border: 1px solid rgba(255, 77, 77, 0.3);
+      border-radius: 6px;
+      padding: 14px 18px;
+      color: var(--red);
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .error-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Stats bar */
+    .stats-bar {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 7px 20px;
+      display: flex;
+      gap: 24px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    .stat span { color: var(--accent); }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon"></div>
+    <div class="logo-text">MARIE <span>Studio</span></div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span>TWO-PASS ASSEMBLER</span>
+    <span style="color: var(--border)">|</span>
+    <span>v1.0</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- LEFT: Editor -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Source Code</span>
+      <span class="panel-badge">.ASM</span>
+    </div>
+
+    <div class="editor-wrap">
+      <div class="line-numbers" id="lineNumbers">1</div>
+      <textarea id="editor" spellcheck="false"
+        placeholder="/ Write your MARIE assembly code here
+        "></textarea>
+    </div>
+
+    <div class="toolbar">
+      <button class="btn-assemble" id="btnAssemble" onclick="assemble()">&#9654; Assemble</button>
+      <button class="btn-clear" onclick="clearAll()">Clear</button>
+      <div class="toolbar-info" id="toolbarInfo">Ready</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Output -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Machine Code Output</span>
+      <span class="panel-badge" id="outBadge">WAITING</span>
+    </div>
+
+    <div class="output-wrap" id="outputWrap">
+      <div class="empty-state" id="emptyState">
+        <div class="empty-grid">
+          <span>0</span><span>1</span><span>0</span><span>0</span><span>0</span><span>1</span>
+          <span>0</span><span>0</span><span>0</span><span>0</span><span>0</span><span>0</span>
+          <span>0</span><span>0</span><span>0</span><span>0</span><span>1</span><span>1</span>
+          <span>0</span><span>1</span><span>1</span><span>1</span><span>0</span><span>0</span>
+        </div>
+        <div class="empty-label">Awaiting assembly</div>
+      </div>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat">Instructions: <span id="statInstr">—</span></div>
+      <div class="stat">Symbols: <span id="statSymbols">—</span></div>
+      <div class="stat">Status: <span id="statStatus">idle</span></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  // ── Line numbers ──
+  const editor = document.getElementById("editor");
+  const lineNumbers = document.getElementById("lineNumbers");
+
+  function updateLineNumbers() {
+    const lines = editor.value.split("\n").length;
+    lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join("<br>");
+  }
+
+  editor.addEventListener("input", updateLineNumbers);
+  editor.addEventListener("scroll", () => { lineNumbers.scrollTop = editor.scrollTop; });
+  updateLineNumbers();
+
+  // ── Assemble ──
+  async function assemble() {
+    const code = editor.value.trim();
+    if (!code) return;
+
+    const btn = document.getElementById("btnAssemble");
+    btn.textContent = "Processing...";
+    btn.classList.add("loading");
+    document.getElementById("toolbarInfo").textContent = "Assembling...";
+
+    try {
+      const res  = await fetch("/assemble", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        renderOutput(data);
+        document.getElementById("statStatus").textContent = "success";
+        document.getElementById("statStatus").style.color = "var(--accent2)";
+        document.getElementById("outBadge").textContent = "DONE";
+        document.getElementById("toolbarInfo").textContent =
+          `${data.output.length} instruction${data.output.length !== 1 ? "s" : ""} assembled`;
+      } else {
+        renderError(data.error);
+        document.getElementById("statStatus").textContent = "error";
+        document.getElementById("statStatus").style.color = "var(--red)";
+        document.getElementById("outBadge").textContent = "ERROR";
+        document.getElementById("toolbarInfo").textContent = "Assembly failed";
+      }
+    } catch (e) {
+      renderError("Could not connect to assembler server.");
+    }
+
+    btn.textContent = "▶ Assemble";
+    btn.classList.remove("loading");
+  }
+
+  function renderOutput(data) {
+    document.getElementById("statInstr").textContent   = data.output.length;
+    document.getElementById("statSymbols").textContent = Object.keys(data.symbol_table).length;
+
+    let html = "";
+
+    // Symbol table
+    if (Object.keys(data.symbol_table).length > 0) {
+      html += `<div class="symbol-section">
+        <div class="section-label">Symbol table</div>
+        <div class="symbol-pills">`;
+      for (const [name, addr] of Object.entries(data.symbol_table)) {
+        html += `<div class="symbol-pill">
+          <span class="sym-name">${name}</span>
+          <span class="sym-addr">@ ${addr.toString(16).toUpperCase().padStart(3,"0")}</span>
+        </div>`;
+      }
+      html += `</div></div>`;
+    }
+
+    // Machine code table
+    html += `<div class="section-label">Machine code</div>
+    <table class="out-table">
+      <thead>
+        <tr>
+          <th>Addr</th>
+          <th>Binary (opcode · operand)</th>
+          <th>Hex</th>
+        </tr>
+      </thead>
+      <tbody>`;
+
+    data.output.forEach(row => {
+      const op   = row.binary.slice(0, 4);
+      const addr = row.binary.slice(4);
+      html += `<tr>
+        <td class="td-addr">${row.address}</td>
+        <td class="td-binary"><span class="op">${op}</span> <span class="addr-bits">${addr}</span></td>
+        <td class="td-hex">${row.hex}</td>
+      </tr>`;
+    });
+
+    html += `</tbody></table>`;
+
+    const wrap = document.getElementById("outputWrap");
+    wrap.innerHTML = html;
+  }
+
+  function renderError(msg) {
+    document.getElementById("statInstr").textContent   = "—";
+    document.getElementById("statSymbols").textContent = "—";
+    document.getElementById("outputWrap").innerHTML = `
+      <div class="error-box">
+        <div class="error-icon">✕</div>
+        <div>${msg}</div>
+      </div>`;
+  }
+
+  function clearAll() {
+    editor.value = "";
+    updateLineNumbers();
+    document.getElementById("outputWrap").innerHTML =
+      document.getElementById("emptyState")?.outerHTML ||
+      `<div class="empty-state"><div class="empty-label">Awaiting assembly</div></div>`;
+    document.getElementById("outBadge").textContent    = "WAITING";
+    document.getElementById("statInstr").textContent   = "—";
+    document.getElementById("statSymbols").textContent = "—";
+    document.getElementById("statStatus").textContent  = "idle";
+    document.getElementById("statStatus").style.color  = "";
+    document.getElementById("toolbarInfo").textContent = "Ready";
+  }
+
+  // Keyboard shortcut: Ctrl+Enter to assemble
+  editor.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      assemble();
+    }
+  });
+</script>
+</body>
+</html>
