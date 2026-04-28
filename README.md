@@ -16,6 +16,7 @@
 ## 📸 Preview
  
 <div align="center">
+ 
 **Empty Editor**
  
 <img src="preview_empty.png" alt="MARIE Studio - Empty Editor" width="800"/>
