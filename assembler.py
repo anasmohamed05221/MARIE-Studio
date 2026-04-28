@@ -19,6 +19,8 @@ def pass1(lines):
         # Check if line has a label (e.g. "LOOP, LOAD X")
         if "," in line:
             label = line.split(",")[0].strip().upper()
+            if label in symbol_table:
+                raise ValueError(f"Line {line_no}: Duplicate label '{label}'")
             symbol_table[label] = address
 
         address += 1
@@ -51,6 +53,15 @@ def pass2(lines, symbol_table):
         instruction = parts[0]
 
         if instruction not in OPCODES:
+
+            if instruction == "DEC":
+                value = int(parts[1])
+                # handle negative numbers (16-bit two's complement)
+                if value < 0:
+                    value = (1 << 16) + value
+                parts = ["HEX", format(value & 0xFFFF, "04X")]
+                instruction = "HEX"
+
             # Handle HEX directive (store raw value)
             if instruction == "HEX":
                 value = int(parts[1], 16)
