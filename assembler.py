@@ -25,6 +25,7 @@ def pass1(lines):
                 raise ValueError(f"Line {line_no+1}: Duplicate label '{label}'")
             symbol_table[label] = address
 
+
         address += 1
         line_no+=1
 
@@ -61,8 +62,8 @@ def pass2(lines, symbol_table):
                 value = int(parts[1])
                 # handle negative numbers (16-bit two's complement)
                 if value < 0:
-                    value = (1 << 16) + value
-                parts = ["HEX", format(value & 0xFFFF, "04X")]
+                    value = value % 65536
+                parts = ["HEX", format(value, "04X")]
                 instruction = "HEX"
 
             # Handle HEX directive (store raw value)
@@ -105,43 +106,4 @@ def pass2(lines, symbol_table):
     return machine_code
 
 
-def main():
-    import sys
 
-    # Get the input file from command line
-    if len(sys.argv) < 2:
-        print("Usage: python assembler.py <filename.asm>")
-        return
-
-    filename = sys.argv[1]
-
-    # Read the file
-    with open(filename, "r") as f:
-        lines = f.readlines()
-
-    # Run both passes
-    print("Running Pass 1 - Building symbol table...")
-    symbol_table = pass1(lines)
-    print(f"Symbol table: {symbol_table}")
-
-    print("\nRunning Pass 2 - Generating machine code...")
-    machine_code = pass2(lines, symbol_table)
-
-    # Print and save output
-    output_filename = filename.replace(".asm", ".out")
-    with open(output_filename, "w") as f:
-        print(f"\n{'Address':<10}{'Binary':<20}{'Hex'}")
-        print("-" * 38)
-        f.write(f"{'Address':<10}{'Binary':<20}{'Hex'}\n")
-        f.write("-" * 38 + "\n")
-
-        for i, (binary, hex_code) in enumerate(machine_code):
-            line = f"{i:<10}{binary:<20}{hex_code}"
-            print(line)
-            f.write(line + "\n")
-
-    print(f"\nOutput saved to {output_filename}")
-
-
-if __name__ == "__main__":
-    main()
