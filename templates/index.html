@@ -195,7 +195,7 @@
       resize: none;
       color: var(--text);
       font-family: var(--mono);
-      font-size: 13px;
+      font-size: 16px;
       line-height: 1.6;
       padding: 16px 18px;
       caret-color: var(--accent);
@@ -319,7 +319,7 @@
     }
 
     .section-label {
-      font-size: 10px;
+      font-size: 16px;
       letter-spacing: 2px;
       color: var(--muted);
       text-transform: uppercase;
@@ -347,20 +347,20 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       padding: 4px 10px;
-      font-size: 12px;
+      font-size: 16px;
       display: flex;
       align-items: center;
       gap: 8px;
     }
 
     .symbol-pill .sym-name { color: var(--amber); }
-    .symbol-pill .sym-addr { color: var(--muted); font-size: 11px; }
+    .symbol-pill .sym-addr { color: var(--muted); font-size: 16px; }
 
     /* Output table */
     .out-table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 12.5px;
+      font-size: 16px;
     }
 
     .out-table th {
@@ -574,7 +574,7 @@
       for (const [name, addr] of Object.entries(data.symbol_table)) {
         html += `<div class="symbol-pill">
           <span class="sym-name">${name}</span>
-          <span class="sym-addr">@ ${addr.toString(16).toUpperCase().padStart(3,"0")}</span>
+          <span class="sym-addr">: ${addr.toString(16).toUpperCase().padStart(3,"0")}</span>
         </div>`;
       }
       html += `</div></div>`;
