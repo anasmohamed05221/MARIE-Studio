@@ -18,7 +18,7 @@ def pass1(lines):
             line_no+=1
             continue
 
-        # Check if line has a label (e.g. "LOOP, LOAD X")
+        # Check if line has a label
         if "," in line:
             label = line.split(",")[0].strip().upper()
             if label in symbol_table:
@@ -52,12 +52,13 @@ def pass2(lines, symbol_table):
         if "," in line:
             line = line.split(",")[1].strip()
 
-        # Split into parts (e.g. ["LOAD", "X"] or ["HALT"])
+        # Split into parts (["LOAD", "X"] or ["HALT"])
         parts = line.upper().split()
         instruction = parts[0]
 
         if instruction not in OPCODES:
 
+            # DEC converts to HEX
             if instruction == "DEC":
                 value = int(parts[1])
                 # handle negative numbers (16-bit two's complement)
@@ -66,7 +67,7 @@ def pass2(lines, symbol_table):
                 parts = ["HEX", format(value, "04X")]
                 instruction = "HEX"
 
-            # Handle HEX directive (store raw value)
+            # Handle HEX directly
             if instruction == "HEX":
                 value = int(parts[1], 16)
                 binary = format(value, "016b")
@@ -85,7 +86,7 @@ def pass2(lines, symbol_table):
 
         # SKIPCOND uses a fixed code (not an address)
         elif instruction == "SKIPCOND":
-            code = parts[1]  # e.g. "000", "400", "800"
+            code = parts[1]  # "000", "400", "800"
             operand_bits = format(int(code, 16), "012b")
 
         # All other instructions use a label or numeric address
