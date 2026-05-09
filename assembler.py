@@ -7,7 +7,7 @@ def pass1(lines):
     """
     symbol_table = {}
     address = 0
-    line_no = 0
+    line_no = 1
 
     for line in lines:
         # Remove comments and strip whitespace
@@ -22,7 +22,7 @@ def pass1(lines):
         if "," in line:
             label = line.split(",")[0].strip().upper()
             if label in symbol_table:
-                raise ValueError(f"Line {line_no+1}: Duplicate label '{label}'")
+                raise ValueError(f"Line {line_no}: Duplicate label '{label}'")
             symbol_table[label] = address
 
 
